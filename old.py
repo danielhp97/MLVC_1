@@ -85,9 +85,6 @@ I=7
 # Armijo Algorithm for jump search.
 # ou seja, mesmo método de G=1 e P=1 (segundo o exemplo da prof.)
 w1 = np.full((1,I),0); # definimos ponto inicial como w^(1) = (0,0,0,...0)
-w1
-w2 = np.zeros((I + 1))
-w2
 tol = 1e-4 # temos que definir um valor de tolerancia
 nt = len (x_train) #onde nt é o nr de obs do treino
 maxit = 10*nt # definimos também o nr max de iterações
