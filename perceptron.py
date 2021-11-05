@@ -16,14 +16,6 @@ from old import X_data_train as X
 # learning rule:
 # w = w + x_n t_n 
 
-# define variables
-I = 7 # polinomial grade
-k = 1 # initial point
-w1 = np.full((1,I),0) # weight vector initialization
-tol = 1e-4 # tolerance value
-nt = len (X) # number or train values
-maxIts = 10*nt # max number of iterations
-
 ############ Auxiliar functions
 def gradiente(w,x,I):
     sum = 0
@@ -115,5 +107,14 @@ def percTrain(X,t,maxIts,online):
 
 
 if __name__=="main":
+    # define variables
+    I = 7 # polinomial grade
+    k = 1 # initial point
+    w1 = np.full((1,I),0) # weight vector initialization
+    tol = 1e-4 # tolerance value
+    nt = len (X) # number or train values
+    maxIts = 10*nt # max number of iterations
     print("Training:")
     w = percTrain(X,Y,maxIts,online=False)
+    print("Perceptron working...")
+    # perc(w,X)
