@@ -3,6 +3,7 @@ import pandas as pd
 from numpy import linalg as LA
 
 from old import Y_data_train as Y
+from old import Y_data_test as Yt
 from old import X_data_train as X
 # perceptron algorithm
 
@@ -20,32 +21,10 @@ I = 7 # polinomial grade
 k = 1 # initial point
 w1 = np.full((1,I),0) # weight vector initialization
 tol = 1e-4 # tolerance value
-nt = len (train_values) # number or train values
-maxit = 10*n # max number of iterations
+nt = len (X) # number or train values
+maxIts = 10*nt # max number of iterations
 
-
-def perc(w,X):
-    # w is the weight vector
-    # X is the input matrix made by columns with input vectors
-
-    # output: binary vector composed by class labels 1 & -1
-    pass
-
-def percTrain(X,t,maxIts,online):
-    # X is the input matrix
-    # t is the input vector target values
-    # maxIts is iteration limit
-    # online: true if online version of optimization, false if batch version
-
-    if online:
-        #online version
-    else:
-        #batch version
-
-
-    # return: w vector
-    pass
-
+############ Auxiliar functions
 def gradiente(w,x,I):
     sum = 0
     for i in range(0,I):
@@ -64,22 +43,77 @@ def batch_gradient(w,x,y):
     sum_gradiente = sum_gradiente / n
     return sum_gradiente
 
+def Cost_function(w,X,Y):
+    val = 0
+    I= len(w)-1
+    nt=len(X)
+    for i in range(1,nt):
+        val += pow((gradiente(w,X[i],I) -Y[i]),2)
+    val= val/(2*nt)
+    return(val)
+def step(w,Cost_k,grad_full,s_k,X,Y,k,nt):
+    eta_k = backtrackingArmijo(w,Cost_k,grad_full,s_k,X,Y)
 
-if __name__="main":
-    wk = 0
-    Custo_k = 0
-    f = 1
-    d = 0
+def backtrackingArmijo(w,Cost_k,grad_full,s_k,X,Y):
+    delta=0.1
+    eta_k=1
+    d=0
     while(d==0):
-        if(LA.norm(batch_gradient(w1,X,Y)) <= tol and f< maxit):
-            d = 1
-        else:# stopagge criteria
-            grad_k = batch_gradient(w1,X,Y) # calculate gradient on wk
-            print("grad_k: ", grad_k)
-            s_k = -grad_k # calcular  search direction
-            Custo_k = fun_Custo(w1,X,Y_data_test) # calculate OF on point wk
-            grad_full = batch_gradient(w1,X,Y) # Calculate complete gradient on point wk
-            print("grad_k: ", grad_full)
-            eta_k = passo(w1,Custo_k,grad_full,s_k,X,Y,k,nt) # Calculate next step size
-            wk = wk + eta_k*s_k # Calculate new point
-    print("Optimal Solution:", wk)
+        if( Cost_function(w+eta_k*s_k,X,Y ) >= (Cost_k+ delta*eta_k * np.dot(grad_full.T,s_k)) ):
+            d=0
+            eta_k=eta_k/2
+            if eta_k*LA.norm(s_k)<=1e-8:
+                eta_k=1
+        else:
+            d=1
+    return eta_ko
+
+############ Main functions
+
+def perc(w,X):
+    # w is the weight vector
+    # X is the input matrix made by columns with input vectors
+
+    # output: binary vector composed by class labels 1 & -1
+    pass
+
+def percTrain(X,t,maxIts,online):
+    # X is the input matrix
+    # t is the input vector target values
+    # maxIts is iteration limit
+    # online: true if online version of optimization, false if batch version
+    t = Y
+    wk = 0 # initialized optimal weight vector 
+    Cost_k = 0 # cost function result
+    i = 0 # iteration count
+    if online: #online version
+        print("to do")
+    else: # batch version
+        stop = 0 # out of iterartion criteria
+        while stop==0:
+            if(LA.norm(batch_gradient(w1,X,Y)) <= tol and i< maxIts):
+                stop = 1
+            else: 
+                print("Iteration n:", i)
+                grad_k = batch_gradient(w1,X,Y) # calculate gradient on wk
+                s_k = -grad_k # calcular search direction
+                Cost_k = Cost_function(w1,X,Yt) # calculate OF on point wk
+                grad_full = batch_gradient(w1,X,Y) # Calculate complete gradient on point wk
+                print("grad_k: ", grad_full)
+                eta_k = step(w1, Cost_k, grad_full, s_k, X, Y, k, nt) # Calculate next step size
+                wk = wk + eta_k*s_k # Calculate new point
+                i += 1
+        print("Optimal weight vector: ",wk)
+        return wk
+            
+        
+
+
+    # return: w vector
+    pass
+
+
+
+if __name__=="main":
+    print("Training:")
+    w = percTrain(X,Y,maxIts,online=False)
