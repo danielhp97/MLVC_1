@@ -5,6 +5,7 @@ from numpy import linalg as LA
 from old import Y_data_train as Y
 from old import Y_data_test as Yt
 from old import X_data_train as X
+from old import X_data_test as Xt
 # perceptron algorithm
 
 
@@ -23,6 +24,8 @@ def gradiente(w,x,I):
         sum += w*pow(x,i)#np.dot() # must have 2 np arrays.
     return sum
 
+
+
 def batch_gradient(w,x,y):
     sum_gradiente = 0
     n = len(x) - 1 if x else None;
@@ -35,6 +38,8 @@ def batch_gradient(w,x,y):
     sum_gradiente = sum_gradiente / n
     return sum_gradiente
 
+
+
 def Cost_function(w,X,Y):
     val = 0
     I= len(w)-1
@@ -43,8 +48,12 @@ def Cost_function(w,X,Y):
         val += pow((gradiente(w,X[i],I) -Y[i]),2)
     val= val/(2*nt)
     return(val)
+
+
 def step(w,Cost_k,grad_full,s_k,X,Y,k,nt):
     eta_k = backtrackingArmijo(w,Cost_k,grad_full,s_k,X,Y)
+
+
 
 def backtrackingArmijo(w,Cost_k,grad_full,s_k,X,Y):
     delta=0.1
@@ -60,12 +69,27 @@ def backtrackingArmijo(w,Cost_k,grad_full,s_k,X,Y):
             d=1
     return eta_ko
 
+
+def sign(x):
+    if x > 0:
+        return 1.0
+    elif x < 0:
+        return -1.0
+    else:
+        return 0.0
+
+
 ############ Main functions
 
 def perc(w,X):
     # w is the weight vector
     # X is the input matrix made by columns with input vectors
-
+    vector = X.loc[:,0]
+    label = X.loc[:,1]   
+    linear_sum = np.dot(w, vector)
+    prediction = sign(linear_sum)
+    error = label - prediction
+    return prediction, error
     # output: binary vector composed by class labels 1 & -1
     pass
 
@@ -114,7 +138,9 @@ if __name__=="main":
     tol = 1e-4 # tolerance value
     nt = len (X) # number or train values
     maxIts = 10*nt # max number of iterations
-    print("Training:")
-    w = percTrain(X,Y,maxIts,online=False)
+    print("Training:") 
+    w = percTrain(X,Y,maxIts,online=False) # training weight vector
     print("Perceptron working...")
+    results, errors = perc(w,Xt) #
+
     # perc(w,X)
