@@ -20,12 +20,10 @@ def main():
 
     features_subset = data_manager.extract_features(mnist_subset[:20])
     print(features_subset)
-
     
-
-    # not working in VSC ?!
-    # plt.imshow (features_subset.area, cmap='gray')
-   
+    plt.imshow(mnist_subset[0], cmap='gray')
+    plt.show()
+     
 
     #plt.plot(X,Y, 'o', color='red' if X == -1 else 'blue')
 

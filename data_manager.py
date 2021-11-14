@@ -1,11 +1,4 @@
-from utils.mnist_reader import *
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas
-import skimage
-import skimage.io
-import skimage.measure
-import os
+from packages import *
 
 
 ### Read data
@@ -23,20 +16,22 @@ def save_images_to_jpgs(path, images, labels):
         image_filename = str(label)+'_'+str(i)+'.jpg'
         skimage.io.imsave(os.path.join(path, image_filename), image.reshape(28, 28))
 
-def extract_features(dataset: np.array):
+def extract_features(dataset: np.array, labels: np.array):
     features = pandas.DataFrame()
     for i,img in enumerate (dataset):
         region = skimage.measure.regionprops(img)[0]
+        
         features = features.append (
             {
-                'image'  : str(i),    # do not change this line, it is the image ID
-                #'class'   : TOOL_NAMES [i // 5],   # do not change this line, it is the image tool name
-                'cx'   : region.centroid[1],    # x and y centroids are useless for out tools ...
-                'cy'   : region.centroid[0],    # ... but demonstrate how to append your 4 features 
+                'image'  : str(i),    # ID of image
+                'class'  : 'Ankle boot' if labels[i] == int(9) else 'Trouser', # Class
+                'cx'   : region.centroid[1],
+                'cy'   : region.centroid[0],
                 'area' : region.area,
                 'convex_area' : region.convex_area,
                 'eccentricity' : region.eccentricity,
                 'perimeter' : region.perimeter,
+                'extent'  : region.extent
             },
             ignore_index = True
         )
