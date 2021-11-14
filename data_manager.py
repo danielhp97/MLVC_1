@@ -7,40 +7,50 @@ import skimage.io
 import skimage.measure
 import os
 
-# method for converting data to a 28x28 image
-def create_image(arr):
-    two_d = (np.reshape(arr, (28, 28)) * 255).astype(np.uint8)
-    # two_d = np.subtract(255,two_d)
-    plt.imshow(two_d, interpolation='nearest',cmap='gray')
-    return two_d
 
-def make_images(path, images, labels):
-    image_list = []
+### Read data
+def read_mnist_data():
+    x_train, y_train = load_mnist('./fashion', kind='train')
+    x_test, y_test = load_mnist('./fashion', kind='t10k') 
+    # print('Images_train:', x_train.shape)
+    # print('Labels_train:', y_train.shape)
+    # print('Images_test:', x_test.shape)
+    # print('Labels_test:', y_test.shape)
+    return x_train, y_train, x_test, y_test
+
+def save_images_to_jpgs(path, images, labels):
     for (i, image), label in zip(enumerate(images), labels):
-        #filepath = path / '{}_{}.jpg'.format(label, i)
-        #image_list[label,i] = image.reshape(28, 28)
         image_filename = str(label)+'_'+str(i)+'.jpg'
         skimage.io.imsave(os.path.join(path, image_filename), image.reshape(28, 28))
-        #skimage.io.imsave(os.path.join(path, image_filename), image_list[label, i])
 
-# def make_labellist(path, kind, labels):
-#     path.mkdir(parents=True, exist_ok=True)
-#     filepaths = [
-#         '{}_{}.jpg'.format(label, i) for i, label in enumerate(labels)
-#     ]
-#     df = pd.DataFrame({'name': filepaths, 'target': labels.tolist()})
-#     df.to_csv(path / '{}.csv'.format(kind), index=False, header=False)
+def extract_features(dataset: np.array):
+    features = pandas.DataFrame()
+    for i,img in enumerate (dataset):
+        region = skimage.measure.regionprops(img)[0]
+        features = features.append (
+            {
+                'image'  : str(i),    # do not change this line, it is the image ID
+                #'class'   : TOOL_NAMES [i // 5],   # do not change this line, it is the image tool name
+                'cx'   : region.centroid[1],    # x and y centroids are useless for out tools ...
+                'cy'   : region.centroid[0],    # ... but demonstrate how to append your 4 features 
+                'area' : region.area,
+                'convex_area' : region.convex_area,
+                'eccentricity' : region.eccentricity,
+                'perimeter' : region.perimeter,
+            },
+            ignore_index = True
+        )
+    features = features.set_index ('image')
+    return features
 
-# Read data
-x_train, y_train = load_mnist('./fashion', kind='train')
-x_test, y_test = load_mnist('./fashion', kind='t10k')
 
-print('Images_train:', x_train.shape)
-print('Labels_train:', y_train.shape)
-print('Images_test:', x_test.shape)
-print('Labels_test:', y_test.shape)
 
-#img = create_image(images[0])
-make_images('./images/train2', x_train, y_train)
-#make_labellist(x_train, y_train)
-make_images('./images/test2', x_test, y_test)
+
+
+# not working in VSC ?!
+# plt.imshow (features_subset[0], cmap='gray')
+
+# hint for subset:
+# seed, ratio, indices
+
+
