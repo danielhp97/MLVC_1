@@ -45,12 +45,7 @@ def extract_features(dataset: np.array):
 
 
 
-
-
-# not working in VSC ?!
-# plt.imshow (features_subset[0], cmap='gray')
-
-# hint for subset:
+# hints for improved subset selection:
 # seed, ratio, indices
 
 
