@@ -2,7 +2,7 @@ from packages import *
 
 def perc(w, X):
 
-    x_hom = np.vstack((np.ones(len(X.T[0]),dtype=int), X.T))
+    x_hom = np.vstack((np.ones(len(X[0]),dtype=int), X))
 
     g = w @ x_hom
     prediction = np.sign(g)
@@ -18,7 +18,7 @@ def percTrain(X, t, maxIts, online):
 
     ## homogenize feature vectors
     ## needed to be transposed due to upcoming matrix multiplication
-    x_hom = np.vstack((np.ones(len(X.T[0]),dtype=int), X.T))
+    x_hom = np.vstack((np.ones(len(X[0]),dtype=int), X))
     w = np.zeros(len(x_hom))
    
     
