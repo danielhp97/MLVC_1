@@ -24,7 +24,7 @@ def extract_features(dataset: np.array, labels: np.array):
         features = features.append (
             {
                 'image'  : str(i),    # ID of image
-                'class'  : 'Ankle boot' if labels[i] == int(9) else 'Trouser', # Class
+                'class'  : 'Ankle boot' if labels[i] == int(9) else 'Trousers', # Class
                 'cx'   : region.centroid[1],
                 'cy'   : region.centroid[0],
                 'area' : region.area,

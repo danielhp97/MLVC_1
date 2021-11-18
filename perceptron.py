@@ -31,6 +31,32 @@ def percTrain(X, t, maxIts, online):
         if running == False:
             break
 
+    plotDataAndDecitionBoundary(X,t,w)
     print (f'{epoch} epochs needed. w = {w}')
     return w
     # output: trained weight vector
+
+def plotDataAndDecitionBoundary (X, t, w):
+
+    # Plot the decision boundary using the resulting weight vector w. 
+    # If you implemented everything correctly, 
+    # it should appear as a straight line separating the red and the blue dots.
+    # Please make sure to write your code in a way, that it also works for other w vectors.
+    # [1 Points]
+
+    plt.scatter (X [0], X[1], c= ['r' if c == 1 else 'b' for c in t])
+
+    # YOUR CODE HERE
+    axes = plt.gca()
+    [left, right] = axes.get_xlim()
+    db_x = np.linspace(left, right, 100)
+
+    wn = [-w[2], w[1]] # Hyperebene bzw. Normalvektor auf w
+    kwn = wn[1]/wn[0]  # Steigung Normalvektor/Hyperebene
+    d = -w[0]/w[2]     # Offset Normalvektor/Hyperebene
+
+    # y = kx + d
+    db_y = kwn*db_x + d
+
+    # plot deciion boundary
+    plt.plot (db_x, db_y, 'g-')
