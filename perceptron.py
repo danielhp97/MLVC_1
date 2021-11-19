@@ -51,42 +51,32 @@ def percTrain(X, t, maxIts, online):
                 wk = wk + eta_k*s_k # Calculate new point
                 i += 1
 
+    plotDataAndDecitionBoundary(X,t,w)
     print (f'{epoch} epochs needed. w = {w}')
     return w
     # output: trained weight vector
 
-#### AUXILIAR FUNCTIONS
+def plotDataAndDecitionBoundary (X, t, w):
 
-def gradiente(w,x,I):
-    sum = 0
-    for i in range(0,I):
-        sum += w*pow(x,i)#np.dot() # must have 2 np arrays.
-    return sum
+    # Plot the decision boundary using the resulting weight vector w. 
+    # If you implemented everything correctly, 
+    # it should appear as a straight line separating the red and the blue dots.
+    # Please make sure to write your code in a way, that it also works for other w vectors.
+    # [1 Points]
 
+    plt.scatter (X [0], X[1], c= ['r' if c == 1 else 'b' for c in t])
 
-def batch_gradient(w,x,y):
-    I = 2
-    sum_gradiente = 0
-    n = len(x) - 1 if x else None;
-    if n == None : raise Exception("Empty Array")
-    for i in range(1,n):
-        sum_pow = 0
-        for j in range(0,I):
-            sum_pow += pow(x[i],j)
-        sum_gradiente += (gradiente(w,x[i],I) - y[i]) * sum_pow
-    sum_gradiente = sum_gradiente / n
-    return sum_gradiente
+    # YOUR CODE HERE
+    axes = plt.gca()
+    [left, right] = axes.get_xlim()
+    db_x = np.linspace(left, right, 100)
 
+    wn = [-w[2], w[1]] # Hyperebene bzw. Normalvektor auf w
+    kwn = wn[1]/wn[0]  # Steigung Normalvektor/Hyperebene
+    d = -w[0]/w[2]     # Offset Normalvektor/Hyperebene
 
-def Cost_function(w,X,Y):
-    val = 0
-    I= len(w)-1
-    nt=len(X)
-    for i in range(1,nt):
-        val += pow((gradiente(w,X[i],I) -Y[i]),2)
-    val= val/(2*nt)
-    return(val)
+    # y = kx + d
+    db_y = kwn*db_x + d
 
-
-def step(w,x,y,gamma):
-    eta_k = batch_gradient(w,x,y) * gamma * 0.1
+    # plot deciion boundary
+    plt.plot (db_x, db_y, 'g-')
