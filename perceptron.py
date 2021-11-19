@@ -13,24 +13,80 @@ def perc(w, X):
     # output: binary vector composed by class labels 1 & -1
 
 def percTrain(X, t, maxIts, online):
-
+    # X is the input matrix
+    # t is the input vector target values
+    # maxIts is iteration limit
+    # online: true if online version of optimization, false if batch version
+    I = 2 # polinomial grade
     gamma = 1
-
+    stop=0
+    i=0
+    tol = 1e-4 # tolerance value
     ## homogenize feature vectors
     ## needed to be transposed due to upcoming matrix multiplication
     x_hom = np.vstack((np.ones(len(X[0]),dtype=int), X))
     w = np.zeros(len(x_hom))
    
-    
-    for epoch in range(1,maxIts):
-        running = False
-        for j in range(len(t)):
-            if w.T @ (x_hom[:,j] * t[j]) <= 0:
-                w = w.T + gamma * x_hom[:,j] * t[j]
-                running = True
-        if running == False:
-            break
+    if online:
+        while stop==0:
+            for epoch in range(1,maxIts):
+                # we can add random  initialization:
+                # random.randint(0,len(X))
+                for j in range(len(t)):
+                    if w.T @ (x_hom[:,j] * t[j]) <= 0:
+                        w = w.T + gamma * x_hom[:,j] * t[j]
+                        stop=1
+                        if stop==1:
+                            break
+    else:
+        while stop==0:
+            if(LA.norm(batch_gradient(w,X,t)) <= tol and i< maxIts):
+                stop = 1
+            else:
+                grad_k = batch_gradient(w,X,t) # calculate gradient on wk
+                s_k = - grad_k # calculate search direction
+                Cost_k = Cost_function(w,X,t) # calculate OF on point wk
+                grad_full = batch_gradient(w,X,t) # Calculate complete gradient on point wk
+                eta_k = step(w, Cost_k, grad_full, s_k, X, t, k=1, nt=len(X)) # Calculate next step size
+                wk = wk + eta_k*s_k # Calculate new point
+                i += 1
 
     print (f'{epoch} epochs needed. w = {w}')
     return w
     # output: trained weight vector
+
+#### AUXILIAR FUNCTIONS
+
+def gradiente(w,x,I):
+    sum = 0
+    for i in range(0,I):
+        sum += w*pow(x,i)#np.dot() # must have 2 np arrays.
+    return sum
+
+
+def batch_gradient(w,x,y):
+    I = 2
+    sum_gradiente = 0
+    n = len(x) - 1 if x else None;
+    if n == None : raise Exception("Empty Array")
+    for i in range(1,n):
+        sum_pow = 0
+        for j in range(0,I):
+            sum_pow += pow(x[i],j)
+        sum_gradiente += (gradiente(w,x[i],I) - y[i]) * sum_pow
+    sum_gradiente = sum_gradiente / n
+    return sum_gradiente
+
+
+def Cost_function(w,X,Y):
+    val = 0
+    I= len(w)-1
+    nt=len(X)
+    for i in range(1,nt):
+        val += pow((gradiente(w,X[i],I) -Y[i]),2)
+    val= val/(2*nt)
+    return(val)
+
+
+def step(w,x,y,gamma):
+    eta_k = batch_gradient(w,x,y) * gamma * 0.1

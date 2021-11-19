@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from numpy import linalg as LA
+import random
 
 from old import Y_data_train as Y
 from old import Y_data_test as Yt
@@ -25,7 +26,6 @@ def gradiente(w,x,I):
     return sum
 
 
-
 def batch_gradient(w,x,y):
     sum_gradiente = 0
     n = len(x) - 1 if x else None;
@@ -38,6 +38,8 @@ def batch_gradient(w,x,y):
     sum_gradiente = sum_gradiente / n
     return sum_gradiente
 
+
+# calculate stochastic gradient
 
 
 def Cost_function(w,X,Y):
@@ -53,7 +55,9 @@ def Cost_function(w,X,Y):
 def step(w,Cost_k,grad_full,s_k,X,Y,k,nt):
     eta_k = backtrackingArmijo(w,Cost_k,grad_full,s_k,X,Y)
 
-
+def step_simple():
+    eta_k = # calculate eta_k
+    # COST(w + nk sk) <= COST(w)    
 
 def backtrackingArmijo(w,Cost_k,grad_full,s_k,X,Y):
     delta=0.1
@@ -103,7 +107,22 @@ def percTrain(X,t,maxIts,online):
     Cost_k = 0 # cost function result
     i = 0 # iteration count
     if online: #online version
-        print("to do")
+        stop = 0 # out of iterartion criteria
+        lr = 1 # learning rate
+        indice = random.randint(0,len(X))
+
+        lr = 1 # choose step size
+        while stop==0:
+            # stop rule
+            if wk.T @ (X[:,j] * t[j]) <= tol and i< maxIts:
+                stop = 1
+            else:
+                #calculate new weight vector
+                st_grad = (gradiente(w,x[i],I) - y[i]) #calculate stochastic gradient
+                s_k = -st_grad # calculate search direction
+                step_k = step_simple() #calculate step
+                wk = wk - step_k * st_grad
+                wk = wk - step_k * s_k # Calculate new point
     else: # batch version
         stop = 0 # out of iterartion criteria
         while stop==0:
@@ -115,22 +134,16 @@ def percTrain(X,t,maxIts,online):
                 s_k = -grad_k # calcular search direction
                 Cost_k = Cost_function(w1,X,Yt) # calculate OF on point wk
                 grad_full = batch_gradient(w1,X,Y) # Calculate complete gradient on point wk
-                print("grad_k: ", grad_full)
                 eta_k = step(w1, Cost_k, grad_full, s_k, X, Y, k, nt) # Calculate next step size
                 wk = wk + eta_k*s_k # Calculate new point
                 i += 1
-        print("Optimal weight vector: ",wk)
-        return wk
-            
-        
-
-
-    # return: w vector
-    pass
+    print (f'{i} epochs needed. w = {wk}')
+    return wk
 
 
 
 if __name__=="main":
+    random.seed(123)
     # define variables
     I = 7 # polinomial grade
     k = 1 # initial point
