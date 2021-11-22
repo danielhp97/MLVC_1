@@ -1,5 +1,42 @@
 from packages import *
 
+# auxiliar functions
+
+def gradiente(w,x,I):
+    sum = 0
+    for i in range(0,I):
+        sum += w*pow(x,i)#np.dot() # must have 2 np arrays.
+    return sum
+
+
+def batch_gradient(w,x,y):
+    I = 2
+    sum_gradiente = 0
+    n = len(x) - 1 if x else None;
+    if n == None : raise Exception("Empty Array")
+    for i in range(1,n):
+        sum_pow = 0
+        for j in range(0,I):
+            sum_pow += pow(x[i],j)
+        sum_gradiente += (gradiente(w,x[i],I) - y[i]) * sum_pow
+    sum_gradiente = sum_gradiente / n
+    return sum_gradiente
+
+
+def Cost_function(w,X,Y):
+    val = 0
+    I= len(w)-1
+    nt=len(X)
+    for i in range(1,nt):
+        val += pow((gradiente(w,X[i],I) -Y[i]),2)
+    val= val/(2*nt)
+    return(val)
+
+
+def step(w,x,y,gamma):
+    eta_k = batch_gradient(w,x,y) * gamma * 0.1
+
+
 def perc(w, X):
 
     x_hom = np.vstack((np.ones(len(X[0]),dtype=int), X))
