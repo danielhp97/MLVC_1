@@ -39,6 +39,15 @@ def extract_features(dataset: np.array, labels: np.array):
     return features
 
 
+def normalize_features(features):
+    features.area = (features.area - min(features.area)) / (max(features.area) - min(features.area))
+    features.cx = (features.cx - min(features.cx)) / (max(features.cx) - min(features.cx))
+    features.cy = (features.cy - min(features.cy)) / (max(features.cy) - min(features.cy))
+    features.convex_area = (features.convex_area - min(features.convex_area)) / (max(features.convex_area) - min(features.convex_area))
+    features.eccentricity = (features.convex_area - min(features.convex_area)) / (max(features.convex_area) - min(features.convex_area))
+    features.perimeter = (features.convex_area - min(features.convex_area)) / (max(features.convex_area) - min(features.convex_area))
+    
+    return features
 
 # hints for improved subset selection:
 # seed, ratio, indices

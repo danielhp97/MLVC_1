@@ -1,5 +1,6 @@
 from utils.mnist_reader import *
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 import numpy as np
 from numpy import linalg as LA
 import seaborn as sns
