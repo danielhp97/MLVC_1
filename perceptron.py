@@ -10,10 +10,14 @@ def gradiente(w,x,I):
 
 
 def batch_gradient(w,x,y):
-    I = 2
+    I = 1
     sum_gradiente = 0
-    n = len(x) - 1 if x else None;
-    if n == None : raise Exception("Empty Array")
+    print("x")
+    print(x)
+    print("len x")
+    print(len(x))
+    n = len(x) - 1 #if x else None
+    #if n == None : raise Exception("Empty Array")
     for i in range(1,n):
         sum_pow = 0
         for j in range(0,I):
@@ -35,6 +39,7 @@ def Cost_function(w,X,Y):
 
 def step(w,x,y,gamma):
     eta_k = batch_gradient(w,x,y) * gamma * 0.1
+    return eta_k
 
 
 def perc(w, X):
@@ -63,10 +68,11 @@ def percTrain(X, t, maxIts, online):
     ## needed to be transposed due to upcoming matrix multiplication
     x_hom = np.vstack((np.ones(len(X[0]),dtype=int), X))
     w = np.zeros(len(x_hom))
-   
+    wk = np.zeros(len(x_hom))
     if online:
         while stop==0:
             for epoch in range(1,maxIts):
+                i = epoch
                 # we can add random  initialization:
                 # random.randint(0,len(X))
                 for j in range(len(t)):
@@ -75,8 +81,27 @@ def percTrain(X, t, maxIts, online):
                         stop=1
                         if stop==1:
                             break
+    elif online=="test":
+        while stop==0:
+            for epoch in range(1,maxIts):
+                i = epoch
+                # we can add random  initialization:
+                # random.randint(0,len(X))
+                for j in range(len(t)):
+                    if w.T @ (x_hom[:,j] * t[j]) <= tol:
+                        w = w.T + gamma * x_hom[:,j] * t[j]
+                        stop=1
+                    else:
+                        eta_k = w.T @ (x_hom[:,j] * t[j])
+                        s_k = -eta_k
+                        w = w + eta_k* s_k
+                        if stop==1:
+                            break
     else:
         while stop==0:
+            X = X[0]
+            print("back to beggining")
+            print(i)
             if(LA.norm(batch_gradient(w,X,t)) <= tol and i< maxIts):
                 stop = 1
             else:
@@ -84,12 +109,12 @@ def percTrain(X, t, maxIts, online):
                 s_k = - grad_k # calculate search direction
                 Cost_k = Cost_function(w,X,t) # calculate OF on point wk
                 grad_full = batch_gradient(w,X,t) # Calculate complete gradient on point wk
-                eta_k = step(w, Cost_k, grad_full, s_k, X, t, k=1, nt=len(X)) # Calculate next step size
+                eta_k = step(w, X, t, gamma) # Calculate next step size
                 wk = wk + eta_k*s_k # Calculate new point
                 i += 1
 
     plotDataAndDecitionBoundary(X,t,w)
-    print (f'{epoch} epochs needed. w = {w}')
+    print (f'{i} epochs needed. w = {w}')
     return w
     # output: trained weight vector
 
