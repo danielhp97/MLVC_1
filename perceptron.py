@@ -54,7 +54,36 @@ def perc(w, X):
 
     # output: binary vector composed by class labels 1 & -1
 
+
 def percTrain(X, t, maxIts, online):
+
+    gamma = 1
+
+    ## homogenize feature vectors
+    ## needed to be transposed due to upcoming matrix multiplication
+    x_hom = np.vstack((np.ones(len(X[0]),dtype=int), X))
+    w = np.zeros(len(x_hom))
+   
+    
+    for epoch in range(1,maxIts):
+        running = False
+        for j in range(len(t)):
+            if w.T @ (x_hom[:,j] * t[j]) <= 0:
+                w = w.T + gamma * x_hom[:,j] * t[j]
+                running = True
+        if running == False:
+            break
+
+    print (f'{epoch} epochs needed. w = {w}')
+    return w
+    # output: trained weight vector
+
+
+
+
+
+
+def percTrain_not_working(X, t, maxIts, online):
     # X is the input matrix
     # t is the input vector target values
     # maxIts is iteration limit
@@ -117,6 +146,86 @@ def percTrain(X, t, maxIts, online):
     print (f'{i} epochs needed. w = {w}')
     return w
     # output: trained weight vector
+
+
+def gradiente(w,x,I):
+    sum = 0
+    for i in range(0,I):
+        sum += w*pow(x,i)#np.dot() # must have 2 np arrays.
+    return sum
+
+
+def batch_gradient(w,x,y):
+    I = 2
+    sum_gradiente = 0
+    n = len(x) - 1 if x else None;
+    if n == None : raise Exception("Empty Array")
+    for i in range(1,n):
+        sum_pow = 0
+        for j in range(0,I):
+            sum_pow += pow(x[i],j)
+        sum_gradiente += (gradiente(w,x[i],I) - y[i]) * sum_pow
+    sum_gradiente = sum_gradiente / n
+    return sum_gradiente
+
+
+def Cost_function(w,X,Y):
+    val = 0
+    I= len(w)-1
+    nt=len(X)
+    for i in range(1,nt):
+        val += pow((gradiente(w,X[i],I) -Y[i]),2)
+    val= val/(2*nt)
+    return(val)
+
+
+def step(w,x,y,gamma):
+    eta_k = batch_gradient(w,x,y) * gamma * 0.1
+
+
+def batch_gradient(w,x,y):
+    sum_gradiente = 0
+    n = len(x) - 1 if x else None;
+    if n == None : raise Exception("Empty Array")
+    for i in range(1,n):
+        sum_pow = 0
+        for j in range(0,I):
+            sum_pow += pow(x[i],j)
+        sum_gradiente += (gradiente(w,x[i],I) - y[i]) * sum_pow
+    sum_gradiente = sum_gradiente / n
+    return sum_gradiente
+
+def Cost_function(w,X,Y):
+    val = 0
+    I= len(w)-1
+    nt=len(X)
+    for i in range(1,nt):
+        val += pow((gradiente(w,X[i],I) -Y[i]),2)
+    val= val/(2*nt)
+    return(val)
+
+def step(w,Cost_k,grad_full,s_k,X,Y,k,nt):
+    eta_k = backtrackingArmijo(w,Cost_k,grad_full,s_k,X,Y)
+
+def backtrackingArmijo(w,Cost_k,grad_full,s_k,X,Y):
+    delta=0.1
+    eta_k=1
+    d=0
+    while(d==0):
+        if( Cost_function(w+eta_k*s_k,X,Y ) >= (Cost_k+ delta*eta_k * np.dot(grad_full.T,s_k)) ):
+            d=0
+            eta_k=eta_k/2
+            if eta_k*LA.norm(s_k)<=1e-8:
+                eta_k=1
+        else:
+            d=1
+    return eta_k
+
+def gradiente(w,x,I):
+    sum = 0
+    for i in range(0,I):
+        sum += w*pow(x,i)#np.dot() # must have 2 np arrays.
+    return sum
 
 def plotDataAndDecitionBoundary (X, t, w):
 
